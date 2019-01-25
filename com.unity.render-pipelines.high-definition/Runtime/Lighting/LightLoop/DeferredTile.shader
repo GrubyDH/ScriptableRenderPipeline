@@ -286,10 +286,12 @@ Shader "Hidden/HDRP/DeferredTile"
             #pragma vertex Vert
             #pragma fragment Frag
 
-            #pragma multi_compile _ DEBUG_DISPLAY
-            #pragma multi_compile  _ SHADOWS_SHADOWMASK /// Variant with and without shadowmask
+            // Chose supported lighting architecture in case of deferred rendering
+            #pragma multi_compile _ LIGHTLOOP_DISABLE_TILE_AND_CLUSTER
 
-            #define UNITY_SINGLE_PASS_STEREO 1
+            #pragma multi_compile _ OUTPUT_SPLIT_LIGHTING
+            #pragma multi_compile _ DEBUG_DISPLAY
+            #pragma multi_compile _ SHADOWS_SHADOWMASK /// Variant with and without shadowmask
 
             #define USE_FPTL_LIGHTLIST 1 // deferred opaque always use FPTL
 
@@ -335,13 +337,17 @@ Shader "Hidden/HDRP/DeferredTile"
             // variable declaration
             //-------------------------------------------------------------------------------------
 
-            uint g_TileListOffset;
-            StructuredBuffer<uint> g_TileList;
+            //#define ENABLE_RAYTRACING
+            #ifdef ENABLE_RAYTRACING
+            CBUFFER_START(UnityDeferred)
+                // Uniform variables that defines if we shall be using the shadow area texture or not
+                int _RaytracedAreaShadow;
+            CBUFFER_END
+            #endif
 
             struct Attributes
             {
                 uint vertexID  : SV_VertexID;
-                uint instID    : SV_InstanceID;
             };
 
             struct Varyings
@@ -351,7 +357,12 @@ Shader "Hidden/HDRP/DeferredTile"
 
             struct Outputs
             {
+            #ifdef OUTPUT_SPLIT_LIGHTING
+                float4 specularLighting : SV_Target0;
+                float3 diffuseLighting  : SV_Target1;
+            #else
                 float4 combinedLighting : SV_Target0;
+            #endif
             };
 
             Varyings Vert(Attributes input)
@@ -365,6 +376,7 @@ Shader "Hidden/HDRP/DeferredTile"
             {
                 // This need to stay in sync with deferred.compute
 
+                // input.positionCS is SV_Position
                 float depth = LOAD_TEXTURE2D(_CameraDepthTexture, input.positionCS.xy).x;
                 PositionInputs posInput = GetPositionInput_Stereo(input.positionCS.xy, _ScreenSize.zw, depth, UNITY_MATRIX_I_VP, UNITY_MATRIX_V, uint2(input.positionCS.xy) / GetTileSize(), unity_StereoEyeIndex);
 
@@ -385,7 +397,20 @@ Shader "Hidden/HDRP/DeferredTile"
 
                 Outputs outputs;
 
+            #ifdef OUTPUT_SPLIT_LIGHTING
+                if (_EnableSubsurfaceScattering != 0 && ShouldOutputSplitLighting(bsdfData))
+                {
+                    outputs.specularLighting = float4(specularLighting, 1.0);
+                    outputs.diffuseLighting  = TagLightingForSSS(diffuseLighting);
+                }
+                else
+                {
+                    outputs.specularLighting = float4(diffuseLighting + specularLighting, 1.0);
+                    outputs.diffuseLighting  = 0;
+                }
+            #else
                 outputs.combinedLighting = float4(diffuseLighting + specularLighting, 1.0);
+            #endif
 
                 return outputs;
             }
