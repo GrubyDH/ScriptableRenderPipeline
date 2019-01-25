@@ -2770,7 +2770,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     }
                 }
                 // Compute as pixel shader (faster on some platforms)
-                if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && k_PreferFragment)
+                else if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && k_PreferFragment)
                 {
                     int w = hdCamera.actualWidth;
                     int h = hdCamera.actualHeight;
