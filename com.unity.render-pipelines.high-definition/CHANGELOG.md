@@ -21,10 +21,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added HD unlit master node (Cross Pipeline version is name Unlit)
 - Added new Rendering Queue in materials
 - Added post-processing V3 framework embed in HDRP, remove postprocess V2 framework
-  - Post-processing now uses the generic volume framework
-  - New depth-of-field, bloom, panini projection effects, motion blur
-  - Exposure is now done as a pre-exposition pass, the whole system has been revamped
-  - Exposure now use EV100 everywhere in the UI (Sky, Emissive Light)
+- Post-processing now uses the generic volume framework
+-   New depth-of-field, bloom, panini projection effects, motion blur
+-   Exposure is now done as a pre-exposition pass, the whole system has been revamped
+-   Exposure now use EV100 everywhere in the UI (Sky, Emissive Light)
 - Added emissive intensity (Luminance and EV100 control) control for Emissive
 - Added pre-exposure weigth for Emissive
 - Added an emissive color node and a slider to control the pre-exposure percentage of emission color
@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added Material validator in Render Pipeline Debug
 - Added code to future support of DXR (not enabled)
 - Added support of multiviewport
+- Added stereo instancing macros to a few shaders
+- Added HDRenderPipeline.RequestSkyEnvironmentUpdate function to force an update from script when sky is set to OnDemand
+- Added a Lighting and BackLighting slots in Lit, StackLit, Fabric and Hair master nodes
 
 ### Fixed
 - Fixed logic to disable FPTL with stereo rendering
@@ -86,6 +89,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed error message when having more than one directional light casting shadow
 - Fixed error when trying to display preview of Camera or PlanarReflectionProbe
 - Fixed LOAD_TEXTURE2D_ARRAY_MSAA macro
+- Fixed min-max and amplitude clamping value in inspector of vertex displacement materials
+- Fixed issue with alpha shadow clip (was incorrectly clipping object shadow)
+- Fixed an issue where sky cubemap would not be cleared correctly when setting the current sky to None
+- Fixed a typo in Static Lighting Sky component UI
 
 ### Changed
 - ColorPyramid compute shader passes is swapped to pixel shader passes on platforms where the later is faster (Nintendo Switch).
@@ -106,6 +113,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Micro-shadowing in Lit forward now use ambientOcclusion instead of SpecularOcclusion
 - Upgraded FrameSettings workflow, DebugMenu and Inspector part relative to it
 - Update build light list shader code to support 32 threads in wavefronts on Switch
+- LayeredLit layers' foldout are now grouped in one main foldout per layer
+- Shadow alpha clip can now be enabled on lit shader and haor shader enven for opaque
 
 ## [5.2.0-preview] - 2018-11-27
 

@@ -2686,8 +2686,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             LightingPassOptions options)
         {
             cmd.SetGlobalBuffer(HDShaderIDs.g_vLightListGlobal, s_LightList);
-
-            if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && options.outputSplitLighting && !k_PreferFragment)
+            if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && options.outputSplitLighting && !k_PreferFragment)
             {
                 // The CS is always in the MRT mode. Do not execute the same shader twice.
                 return;
@@ -2699,14 +2698,14 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             string singlePassName = "SinglePass - Deferred Lighting Pass";
             string SinglePassMRTName = "SinglePass - Deferred Lighting Pass MRT";
             
-            string sLabel = m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) ?
+            string sLabel = m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile) ?
                 (options.outputSplitLighting ? tilePassMRTName : tilePassName) :
                 (options.outputSplitLighting ? SinglePassMRTName : singlePassName);
 
             using (new ProfilingSample(cmd, sLabel, CustomSamplerId.TPRenderDeferredLighting.GetSampler()))
             {
                 // Compute path
-                if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && !k_PreferFragment)
+                if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && !k_PreferFragment)
                 {
                     int w = hdCamera.actualWidth;
                     int h = hdCamera.actualHeight;
@@ -2840,7 +2839,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 else // Pixel shader evaluation
                 {
                     int index = GetDeferredLightingMaterialIndex(options.outputSplitLighting ? 1 : 0,
-                            m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) ? 1 : 0,
+                            m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile) ? 1 : 0,
                             m_enableBakeShadowMask ? 1 : 0,
                             debugDisplaySettings.IsDebugDisplayEnabled() ? 1 : 0);
 
