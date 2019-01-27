@@ -2769,7 +2769,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     }
                 }
                 // Compute as pixel shader (faster on some platforms)
-                else if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && k_PreferFragment)
+                else if (m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile) && m_FrameSettings.IsEnabled(FrameSettingsField.ComputeLightEvaluation) && k_PreferFragment)
                 {
                     int w = hdCamera.actualWidth;
                     int h = hdCamera.actualHeight;
@@ -2821,7 +2821,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     }
                     else
                     {
-                        CoreUtils.SetKeyword(cmd, "LIGHTLOOP_DISABLE_TILE_AND_CLUSTER", m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTileAndCluster));
+                        CoreUtils.SetKeyword(cmd, "LIGHTLOOP_DISABLE_TILE_AND_CLUSTER", m_FrameSettings.IsEnabled(FrameSettingsField.DeferredTile));
                         CoreUtils.SetKeyword(cmd, "DEBUG_DISPLAY", debugDisplaySettings.IsDebugDisplayEnabled());
 
                         int numEyes = hdCamera.camera.stereoEnabled ? (int)hdCamera.numEyes : 1;
